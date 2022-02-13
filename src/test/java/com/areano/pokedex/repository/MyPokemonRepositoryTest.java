@@ -16,8 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -67,6 +66,20 @@ class MyPokemonRepositoryTest {
 		val response = myPokemonRepository.getPokemonSpecies("mewtwo");
 		assertTrue(response.isPresent());
 		assertEquals(response.get(), ps);
+
+	}
+
+	@Test
+	void shouldReturnEmptyIfResponseIsDifferentThan2xx() throws Exception {
+
+		mockRestServiceServer = MockRestServiceServer.createServer(this.restTemplate);
+
+		mockRestServiceServer.expect(once(), requestTo(new URI("https://pokeapi.co/api/v2/pokemon-species/mewtwo")))
+				.andExpect(method(HttpMethod.GET))
+				.andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+		val response = myPokemonRepository.getPokemonSpecies("mewtwo");
+		assertFalse(response.isPresent());
 
 	}
 
