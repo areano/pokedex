@@ -1,4 +1,4 @@
-package com.areano.pokedex.repository.model;
+package com.areano.pokedex.repository.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode
-public class PokedexNumber {
-	public int entry_number;
-	public Pokedex pokedex;
+public class Language {
+	public String name;
+	public String url;
 }

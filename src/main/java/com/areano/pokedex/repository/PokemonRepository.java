@@ -1,6 +1,6 @@
 package com.areano.pokedex.repository;
 
-import com.areano.pokedex.repository.model.PokemonSpecies;
+import com.areano.pokedex.repository.dao.PokemonSpecies;
 
 import java.util.Optional;
 

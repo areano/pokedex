@@ -1,6 +1,6 @@
 package com.areano.pokedex.repository;
 
-import com.areano.pokedex.repository.model.*;
+import com.areano.pokedex.repository.dao.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.jupiter.api.Test;

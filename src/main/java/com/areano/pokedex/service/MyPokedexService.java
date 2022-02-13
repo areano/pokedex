@@ -1,8 +1,8 @@
 package com.areano.pokedex.service;
 
 import com.areano.pokedex.repository.PokemonRepository;
-import com.areano.pokedex.repository.model.FlavorTextEntry;
-import com.areano.pokedex.repository.model.PokemonSpecies;
+import com.areano.pokedex.repository.dao.FlavorTextEntry;
+import com.areano.pokedex.repository.dao.PokemonSpecies;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;

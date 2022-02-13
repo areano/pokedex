@@ -1,4 +1,4 @@
-package com.areano.pokedex.repository.model;
+package com.areano.pokedex.repository.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode
-public class FlavorTextEntry {
-	public String flavor_text;
-	public Language language;
-	public Version version;
+public class PalParkEncounter {
+	public Area area;
+	public int base_score;
+	public int rate;
 }

@@ -1,7 +1,7 @@
 package com.areano.pokedex.service;
 
 import com.areano.pokedex.repository.PokemonRepository;
-import com.areano.pokedex.repository.model.*;
+import com.areano.pokedex.repository.dao.*;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

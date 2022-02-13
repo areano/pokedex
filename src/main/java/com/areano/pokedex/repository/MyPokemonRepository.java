@@ -1,6 +1,6 @@
 package com.areano.pokedex.repository;
 
-import com.areano.pokedex.repository.model.PokemonSpecies;
+import com.areano.pokedex.repository.dao.PokemonSpecies;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
