@@ -30,6 +30,7 @@ class MyPokedexService implements PokedexService {
 				.isLegendary(pokemonSpecies.is_legendary);
 
 		getFirstDescriptionInEnglish(pokemonSpecies.getFlavor_text_entries())
+				.map(MyPokedexService::sanitiseDescription)
 				.ifPresent(pb::description);
 
 		return pb.build();
@@ -42,4 +43,8 @@ class MyPokedexService implements PokedexService {
 				.map(FlavorTextEntry::getFlavor_text);
 	}
 
+	private static String sanitiseDescription(String description) {
+		return description
+				.replaceAll("[\n\f\r\t]", " ");
+	}
 }
