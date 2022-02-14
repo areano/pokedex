@@ -1,5 +1,6 @@
 package com.areano.pokedex.service;
 
+import com.areano.pokedex.repository.FunTranslationRepository;
 import com.areano.pokedex.repository.PokemonRepository;
 import com.areano.pokedex.repository.dao.FlavorTextEntry;
 import com.areano.pokedex.repository.dao.PokemonSpecies;
@@ -16,24 +17,47 @@ import java.util.Optional;
 class MyPokedexService implements PokedexService {
 
 	private final PokemonRepository pokemonRepository;
+	private final FunTranslationRepository funTranslationRepository;
 
 	@Override
 	public Optional<Pokemon> getPokemon(String name) {
-		return pokemonRepository.getPokemonSpecies(name)
-				.map(MyPokedexService::createPokemonFromPokemonSpecies);
+		return getPokemon(name, false);
 	}
 
-	private static Pokemon createPokemonFromPokemonSpecies(PokemonSpecies pokemonSpecies) {
+	@Override
+	public Optional<Pokemon> getPokemonTranslated(String name) {
+		return getPokemon(name, true);
+	}
+
+	private Optional<Pokemon> getPokemon(String name, boolean translate) {
+		return pokemonRepository.getPokemonSpecies(name)
+				.map(pokemonSpecies -> createPokemonFromPokemonSpecies(pokemonSpecies, translate));
+	}
+
+	private Pokemon createPokemonFromPokemonSpecies(PokemonSpecies pokemonSpecies, boolean translate) {
+		val habitat = pokemonSpecies.getHabitat().getName();
+		val isLegendary = pokemonSpecies.is_legendary;
 		val pb = Pokemon.builder()
 				.name(pokemonSpecies.getName())
-				.habitat(pokemonSpecies.getHabitat().getName())
-				.isLegendary(pokemonSpecies.is_legendary);
+				.habitat(habitat)
+				.isLegendary(isLegendary);
 
 		getFirstDescriptionInEnglish(pokemonSpecies.getFlavor_text_entries())
 				.map(MyPokedexService::sanitiseDescription)
+				.map(description -> translate ?
+						translateDescription(description, habitat, isLegendary).orElse(description) :
+						description
+				)
 				.ifPresent(pb::description);
 
 		return pb.build();
+	}
+
+	private Optional<String> translateDescription(String description, String habitat, boolean isLegendary) {
+		if (habitat.equalsIgnoreCase("cave") || isLegendary) {
+			return this.funTranslationRepository.getTranslation(description, FunTranslationRepository.TranslationType.YODA);
+		}
+		return this.funTranslationRepository.getTranslation(description, FunTranslationRepository.TranslationType.SHAKESPEARE);
 	}
 
 	private static Optional<String> getFirstDescriptionInEnglish(List<FlavorTextEntry> entries) {

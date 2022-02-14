@@ -1,79 +1,145 @@
 package com.areano.pokedex.service;
 
+import com.areano.pokedex.repository.FunTranslationRepository;
 import com.areano.pokedex.repository.PokemonRepository;
 import com.areano.pokedex.repository.dao.*;
 import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
 class MyPokedexServiceTest {
 
+	private PokemonRepository pokemonRepository;
+	private FunTranslationRepository funTranslationRepository;
+	private MyPokedexService pokedexService;
+
+	@BeforeEach
+	void beforeEach() {
+		pokemonRepository = mock(PokemonRepository.class);
+		funTranslationRepository = mock(FunTranslationRepository.class);
+		pokedexService = new MyPokedexService(pokemonRepository, funTranslationRepository);
+	}
+
 	@Test
-	void getPokemon() throws Exception {
+	void shouldGetPokemonByName() throws Exception {
 
-		val repository = Mockito.mock(PokemonRepository.class);
-		val service = new MyPokedexService(repository);
+		val ps = createPokemonSpecies("mewtwo", "rare", "description", false);
 
-		val ps = new PokemonSpecies();
-		ps.setName("mewtwo");
-		ps.set_legendary(true);
-		ps.setHabitat(new Habitat("rare", "https://pokeapi.co/api/v2/pokemon-habitat/5/"));
-		ps.setFlavor_text_entries(new ArrayList<>() {
-			{
-				add(new FlavorTextEntry(
-						"description",
-						new Language("en", "url"),
-						new Version("version", "url")
-				));
-			}
-		});
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		Mockito.when(repository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
-
-		val pokemon = service.getPokemon("mewtwo");
+		val pokemon = pokedexService.getPokemon("mewtwo");
 
 		assertTrue(pokemon.isPresent());
 		assertEquals("mewtwo", pokemon.get().getName());
 		assertEquals("rare", pokemon.get().getHabitat());
 		assertEquals("description", pokemon.get().getDescription());
-		assertTrue(pokemon.get().isLegendary());
+		assertFalse(pokemon.get().isLegendary());
 
 	}
 
 	@Test
 	void sanitisePokemonDescription() throws Exception {
 
-		val repository = Mockito.mock(PokemonRepository.class);
-		val service = new MyPokedexService(repository);
+		val ps = createPokemonSpecies("mewtwo", "rare", "some\r\f\n\tdescription", false);
 
-		val ps = new PokemonSpecies();
-		ps.setName("mewtwo");
-		ps.set_legendary(true);
-		ps.setHabitat(new Habitat("rare", "https://pokeapi.co/api/v2/pokemon-habitat/5/"));
-		ps.setFlavor_text_entries(new ArrayList<>() {
-			{
-				add(new FlavorTextEntry(
-						"some\r\f\n\tdescription",
-						new Language("en", "url"),
-						new Version("version", "url")
-				));
-			}
-		});
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		Mockito.when(repository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
-
-		val pokemon = service.getPokemon("mewtwo");
+		val pokemon = pokedexService.getPokemon("mewtwo");
 
 		assertTrue(pokemon.isPresent());
 		assertEquals("some    description", pokemon.get().getDescription());
 
 	}
 
+	@Test
+	void shouldReturnPokemonTranslatedWithYodaIfHabitatIsRare() throws Exception {
+
+		val ps = createPokemonSpecies("mewtwo", "cave", "original description", false);
+
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
+
+		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.YODA))
+				.thenReturn(Optional.of("yoda description"));
+
+		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
+
+		assertTrue(pokemon.isPresent());
+		assertEquals("yoda description", pokemon.get().getDescription());
+
+	}
+
+	@Test
+	void shouldReturnPokemonTranslatedWithYodaIfLegendary() throws Exception {
+
+		val ps = createPokemonSpecies("mewtwo", "rare", "original description", true);
+
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
+
+		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.YODA))
+				.thenReturn(Optional.of("yoda description"));
+
+		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
+
+		assertTrue(pokemon.isPresent());
+		assertEquals("yoda description", pokemon.get().getDescription());
+
+	}
+
+	@Test
+	void shouldReturnPokemonTranslatedWithShakespeare() throws Exception {
+
+		val ps = createPokemonSpecies("mewtwo", "rare", "original description", false);
+
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
+
+		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.SHAKESPEARE))
+				.thenReturn(Optional.of("shakespeare description"));
+
+		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
+
+		assertTrue(pokemon.isPresent());
+		assertEquals("shakespeare description", pokemon.get().getDescription());
+
+	}
+
+	@Test
+	void shouldReturnStandardDescriptionIfItCannotTranslate() throws Exception {
+
+		val ps = createPokemonSpecies("mewtwo", "rare", "original description", false);
+
+		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
+
+		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.SHAKESPEARE))
+				.thenReturn(Optional.empty());
+
+		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
+
+		assertTrue(pokemon.isPresent());
+		assertEquals("original description", pokemon.get().getDescription());
+
+	}
+
+	private static PokemonSpecies createPokemonSpecies(String name, String habitat, String description, boolean legendary) {
+		val ps = new PokemonSpecies();
+		ps.setName(name);
+		ps.set_legendary(legendary);
+		ps.setHabitat(new Habitat(habitat, "url"));
+		ps.setFlavor_text_entries(new ArrayList<>() {
+			{
+				add(new FlavorTextEntry(
+						description,
+						new Language("en", "url"),
+						new Version("version", "url")
+				));
+			}
+		});
+		return ps;
+	}
 }
