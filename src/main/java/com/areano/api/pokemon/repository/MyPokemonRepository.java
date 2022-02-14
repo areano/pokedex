@@ -28,6 +28,8 @@ class MyPokemonRepository implements PokemonRepository {
 				.build();
 
 		try {
+			log.info(String.format("Getting information for pokemon '%s'", name));
+
 			val response = this.restTemplate.exchange(request, PokemonSpecies.class);
 			return Optional.ofNullable(response.getBody());
 		} catch (RestClientException e) {

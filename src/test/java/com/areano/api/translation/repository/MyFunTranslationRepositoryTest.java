@@ -1,7 +1,5 @@
-package com.areano.api.repository;
+package com.areano.api.translation.repository;
 
-import com.areano.api.translation.repository.FunTranslationRepository;
-import com.areano.api.translation.repository.MyFunTranslationRepository;
 import com.areano.api.translation.repository.dao.Contents;
 import com.areano.api.translation.repository.dao.FunTranslation;
 import com.areano.api.translation.repository.dao.Success;
@@ -65,7 +63,7 @@ class MyFunTranslationRepositoryTest {
 						.body(mapper.writeValueAsString(translation))
 				);
 
-		val response = myFunTranslationRepository.getTranslation("text to translate", FunTranslationRepository.TranslationType.YODA);
+		val response = myFunTranslationRepository.getTranslation("text to translate", TranslationType.YODA);
 		assertTrue(response.isPresent());
 		assertEquals(translation.getContents().getTranslated(), response.get());
 
@@ -89,7 +87,7 @@ class MyFunTranslationRepositoryTest {
 						.body(mapper.writeValueAsString(translation))
 				);
 
-		val response = myFunTranslationRepository.getTranslation("text to translate", FunTranslationRepository.TranslationType.SHAKESPEARE);
+		val response = myFunTranslationRepository.getTranslation("text to translate", TranslationType.SHAKESPEARE);
 		assertTrue(response.isPresent());
 		assertEquals(translation.getContents().getTranslated(), response.get());
 

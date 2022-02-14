@@ -3,6 +3,7 @@ package com.areano.api.pokedex.service;
 import com.areano.api.pokemon.repository.PokemonRepository;
 import com.areano.api.pokemon.repository.dao.*;
 import com.areano.api.translation.repository.FunTranslationRepository;
+import com.areano.api.translation.repository.TranslationType;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class MyPokedexServiceTest {
 
 		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.YODA))
+		when(funTranslationRepository.getTranslation("original description", TranslationType.YODA))
 				.thenReturn(Optional.of("yoda description"));
 
 		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
@@ -83,7 +84,7 @@ class MyPokedexServiceTest {
 
 		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.YODA))
+		when(funTranslationRepository.getTranslation("original description", TranslationType.YODA))
 				.thenReturn(Optional.of("yoda description"));
 
 		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
@@ -100,7 +101,7 @@ class MyPokedexServiceTest {
 
 		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.SHAKESPEARE))
+		when(funTranslationRepository.getTranslation("original description", TranslationType.SHAKESPEARE))
 				.thenReturn(Optional.of("shakespeare description"));
 
 		val pokemon = pokedexService.getPokemonTranslated("mewtwo");
@@ -117,7 +118,7 @@ class MyPokedexServiceTest {
 
 		when(pokemonRepository.getPokemonSpecies("mewtwo")).thenReturn(Optional.of(ps));
 
-		when(funTranslationRepository.getTranslation("original description", FunTranslationRepository.TranslationType.SHAKESPEARE))
+		when(funTranslationRepository.getTranslation("original description", TranslationType.SHAKESPEARE))
 				.thenReturn(Optional.empty());
 
 		val pokemon = pokedexService.getPokemonTranslated("mewtwo");

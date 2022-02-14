@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class MyFunTranslationRepository implements FunTranslationRepository {
+class MyFunTranslationRepository implements FunTranslationRepository {
 
 	private final RestTemplate restTemplate;
 
@@ -35,7 +35,8 @@ public class MyFunTranslationRepository implements FunTranslationRepository {
 				.build();
 
 		try {
-			log.info(uri);
+			log.info(String.format("Getting %s translation", translationType));
+
 			val response = this.restTemplate.exchange(request, FunTranslation.class);
 			return Optional.ofNullable(response.getBody())
 					.map(FunTranslation::getContents)

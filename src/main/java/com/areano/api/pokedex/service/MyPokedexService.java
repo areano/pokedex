@@ -5,6 +5,7 @@ import com.areano.api.pokemon.repository.PokemonRepository;
 import com.areano.api.pokemon.repository.dao.FlavorTextEntry;
 import com.areano.api.pokemon.repository.dao.PokemonSpecies;
 import com.areano.api.translation.repository.FunTranslationRepository;
+import com.areano.api.translation.repository.TranslationType;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
@@ -56,9 +57,9 @@ class MyPokedexService implements PokedexService {
 
 	private Optional<String> translateDescription(String description, String habitat, boolean isLegendary) {
 		if (habitat.equalsIgnoreCase("cave") || isLegendary) {
-			return this.funTranslationRepository.getTranslation(description, FunTranslationRepository.TranslationType.YODA);
+			return this.funTranslationRepository.getTranslation(description, TranslationType.YODA);
 		}
-		return this.funTranslationRepository.getTranslation(description, FunTranslationRepository.TranslationType.SHAKESPEARE);
+		return this.funTranslationRepository.getTranslation(description, TranslationType.SHAKESPEARE);
 	}
 
 	private static Optional<String> getFirstDescriptionInEnglish(List<FlavorTextEntry> entries) {
