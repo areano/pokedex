@@ -1,9 +1,8 @@
 package com.areano.pokedex;
 
-import com.areano.pokedex.service.Pokemon;
 import com.areano.pokedex.service.PokedexService;
+import com.areano.pokedex.service.Pokemon;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,8 +13,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
 class PokedexControllerTest {
@@ -29,7 +29,7 @@ class PokedexControllerTest {
 	@Test
 	void shouldReturnPokemonInformation() throws Exception {
 
-		Mockito.when(this.pokedexService.getPokemon("name")).thenReturn(Optional.of(Pokemon.builder()
+		when(this.pokedexService.getPokemon("name")).thenReturn(Optional.of(Pokemon.builder()
 				.name("name")
 				.description("description")
 				.habitat("habitat")
@@ -53,6 +53,41 @@ class PokedexControllerTest {
 
 		this.mockMvc.perform(MockMvcRequestBuilders
 						.get("/pokemon/name")
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isNotFound());
+
+	}
+
+	@Test
+	void shouldReturnPokemonTranslation() throws Exception {
+
+		when(this.pokedexService.getPokemonTranslated("name")).thenReturn(Optional.of(Pokemon.builder()
+				.name("name")
+				.description("translated description")
+				.habitat("habitat")
+				.isLegendary(true)
+				.build()));
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+						.get("/pokemon/translated/name")
+						.accept(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.description").value("translated description"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.habitat").value("habitat"))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.legendary").value(true));
+
+	}
+
+	@Test
+	void shouldReturnNotFoundIfPokemonTranslationDoesNotExists() throws Exception {
+
+		when(this.pokedexService.getPokemonTranslated("name")).thenReturn(Optional.empty());
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+						.get("/pokemon/translated/name")
 						.accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isNotFound());

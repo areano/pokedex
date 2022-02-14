@@ -23,4 +23,13 @@ class PokedexController {
 
 	}
 
+	@GetMapping("/pokemon/translated/{name}")
+	ResponseEntity<Pokemon> getPokemonTranslated(@PathVariable String name) {
+
+		return this.pokedexService.getPokemonTranslated(name)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+
+	}
+
 }
