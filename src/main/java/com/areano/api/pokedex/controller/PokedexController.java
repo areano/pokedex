@@ -6,15 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/pokemon")
 class PokedexController {
 
 	private final PokedexService pokedexService;
 
-	@GetMapping("/pokemon/{name}")
+	@GetMapping("/{name}")
 	ResponseEntity<Pokemon> getPokemon(@PathVariable String name) {
 
 		return this.pokedexService.getPokemon(name)
@@ -23,7 +25,7 @@ class PokedexController {
 
 	}
 
-	@GetMapping("/pokemon/translated/{name}")
+	@GetMapping("/translated/{name}")
 	ResponseEntity<Pokemon> getPokemonTranslated(@PathVariable String name) {
 
 		return this.pokedexService.getPokemonTranslated(name)

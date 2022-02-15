@@ -2,9 +2,9 @@ package com.areano.api.translation.repository;
 
 import com.areano.api.translation.repository.dao.Contents;
 import com.areano.api.translation.repository.dao.FunTranslation;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Repository;
@@ -15,11 +15,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
 @Slf4j
 class MyFunTranslationRepository implements FunTranslationRepository {
 
+	private final String translationBaseUri;
 	private final RestTemplate restTemplate;
+
+	MyFunTranslationRepository(@Value("${translation.uri.base}") String translationBaseUri, RestTemplate restTemplate) {
+		this.translationBaseUri = translationBaseUri;
+		this.restTemplate = restTemplate;
+	}
 
 	@Override
 	public Optional<String> getTranslation(String text, TranslationType translationType) {
@@ -47,12 +52,12 @@ class MyFunTranslationRepository implements FunTranslationRepository {
 		}
 	}
 
-	private static String getUri(TranslationType translationType) {
+	private String getUri(TranslationType translationType) {
 		switch (translationType) {
 			case YODA:
-				return "https://api.funtranslations.com/translate/yoda";
+				return translationBaseUri + "/yoda";
 			case SHAKESPEARE:
-				return "https://api.funtranslations.com/translate/shakespeare";
+				return translationBaseUri + "/shakespeare";
 			default:
 				throw new IllegalArgumentException("Translation type is not supported");
 		}

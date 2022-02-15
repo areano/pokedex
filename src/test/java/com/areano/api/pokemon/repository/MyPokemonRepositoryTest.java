@@ -3,10 +3,12 @@ package com.areano.api.pokemon.repository;
 import com.areano.api.pokemon.repository.dao.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.core.env.PropertyResolver;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.MockRestServiceServer.createServer;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -35,12 +38,20 @@ class MyPokemonRepositoryTest {
 	@Autowired
 	private MyPokemonRepository myPokemonRepository;
 
+	@Autowired
+	private PropertyResolver propertyResolver;
+
 	private final ObjectMapper mapper = new ObjectMapper();
+	private String baseUri;
+
+	@BeforeEach
+	void beforeEach() {
+		mockRestServiceServer = createServer(this.restTemplate);
+		baseUri = propertyResolver.getProperty("pokemon.uri.base");
+	}
 
 	@Test
 	void shouldReturnParsedDataFromPokemonApi() throws Exception {
-
-		mockRestServiceServer = MockRestServiceServer.createServer(this.restTemplate);
 
 		val ps = new PokemonSpecies();
 		ps.setName("mewtwo");
@@ -56,7 +67,8 @@ class MyPokemonRepositoryTest {
 			}
 		});
 
-		mockRestServiceServer.expect(once(), requestTo(new URI("https://pokeapi.co/api/v2/pokemon-species/mewtwo")))
+
+		mockRestServiceServer.expect(once(), requestTo(new URI(baseUri + "/mewtwo")))
 				.andExpect(method(HttpMethod.GET))
 				.andRespond(withStatus(HttpStatus.OK)
 						.contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +86,7 @@ class MyPokemonRepositoryTest {
 
 		mockRestServiceServer = MockRestServiceServer.createServer(this.restTemplate);
 
-		mockRestServiceServer.expect(once(), requestTo(new URI("https://pokeapi.co/api/v2/pokemon-species/mewtwo")))
+		mockRestServiceServer.expect(once(), requestTo(new URI(baseUri + "/mewtwo")))
 				.andExpect(method(HttpMethod.GET))
 				.andRespond(withStatus(HttpStatus.NOT_FOUND));
 

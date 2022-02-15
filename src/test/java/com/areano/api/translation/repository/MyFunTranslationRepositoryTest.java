@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.core.env.PropertyResolver;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,11 +39,16 @@ class MyFunTranslationRepositoryTest {
 	@Autowired
 	private MyFunTranslationRepository myFunTranslationRepository;
 
+	@Autowired
+	private PropertyResolver propertyResolver;
+
 	private final ObjectMapper mapper = new ObjectMapper();
+	private String baseUri;
 
 	@BeforeEach
 	void beforeEach() {
 		mockRestServiceServer = createServer(this.restTemplate);
+		baseUri = propertyResolver.getProperty("translation.uri.base");
 	}
 
 	@Test
@@ -52,7 +58,7 @@ class MyFunTranslationRepositoryTest {
 		translation.setSuccess(new Success(1));
 		translation.setContents(new Contents("text translated", "text to translate", "yoda"));
 
-		val uri = UriComponentsBuilder.fromUriString("https://api.funtranslations.com/translate/yoda")
+		val uri = UriComponentsBuilder.fromUriString(baseUri + "/yoda")
 				.queryParam("text", "text to translate")
 				.toUriString();
 
@@ -76,7 +82,7 @@ class MyFunTranslationRepositoryTest {
 		translation.setSuccess(new Success(1));
 		translation.setContents(new Contents("text translated", "text to translate", "yoda"));
 
-		val uri = UriComponentsBuilder.fromUriString("https://api.funtranslations.com/translate/shakespeare")
+		val uri = UriComponentsBuilder.fromUriString(baseUri + "/shakespeare")
 				.queryParam("text", "text to translate")
 				.toUriString();
 
